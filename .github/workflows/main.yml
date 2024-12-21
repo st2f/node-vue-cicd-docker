@@ -6,12 +6,30 @@ on:
 jobs:
   build-frontend:
     runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        include:
+        -
+          context_name: ./frontend
+          image_name: ghcr.io/${{ github.repository }}/frontend:latest
+        -
+          context_name: ./node-api
+          image_name: ghcr.io/${{ github.repository }}/node-api:latest
+
     permissions:
       packages: write
+
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image_name }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -29,9 +47,10 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
+          context: ${{ matrix.context_name }}
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          tags: ${{ matrix.image_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-  # build-api-node
-  
+ 

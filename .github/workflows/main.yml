@@ -74,9 +74,9 @@ jobs:
         -
           context_name: ./frontend
           image_name: ghcr.io/${{ github.repository }}/frontend:latest
-        -
-          context_name: ./node-api
-          image_name: ghcr.io/${{ github.repository }}/node-api:latest
+        # -
+        #   context_name: ./node-api
+        #   image_name: ghcr.io/${{ github.repository }}/node-api:latest
 
     permissions:
       packages: write
@@ -117,6 +117,9 @@ jobs:
   e2e:
     needs: [build]
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./frontend
 
     steps:
       - 
@@ -127,7 +130,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           cache: "npm"
-          cache-dependency-path: ./node-api/package.json
+          cache-dependency-path: ./frontend/package.json
       - 
         name: install dependency
         run: npm ci --prefer-offline

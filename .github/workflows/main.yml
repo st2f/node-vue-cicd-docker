@@ -60,12 +60,9 @@ jobs:
       - 
         name: Upload e2e coverage reports to Codecov
         uses: codecov/codecov-action@v5
-        env: 
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-        # with:
-        #   token: ${{ secrets.CODECOV_TOKEN }}
-        #   slug: st2f/node-vue-cicd-docker
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: ${{ github.repository }}
 
   build-frontend-and-node-api:
     needs: [tests-frontend, tests-backend]

@@ -74,9 +74,9 @@ jobs:
         -
           context_name: ./frontend
           image_name: ghcr.io/${{ github.repository }}/frontend:latest
-        # -
-        #   context_name: ./node-api
-        #   image_name: ghcr.io/${{ github.repository }}/node-api:latest
+        -
+          context_name: ./node-api
+          image_name: ghcr.io/${{ github.repository }}/node-api:latest
 
     permissions:
       packages: write

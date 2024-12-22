@@ -4,7 +4,71 @@ on:
     branches: main
 
 jobs:
-  build-frontend:
+
+  tests-frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - 
+        name: checkout code
+        uses: actions/checkout@v4
+      - 
+        name: install nodejs
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: ./client/package.json
+      - 
+        name: install dependency
+        run: npm ci --prefer-offline
+      - 
+        name: verify code
+        run: npm run lint
+      - 
+        name: check packages vulerabilities
+        run: npm audit --moderate
+
+  tests-backend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./node-api
+    steps:
+      - 
+        name: checkout code
+        uses: actions/checkout@v4
+      - 
+        name: install nodejs
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: ./nod-api/package.json
+      - 
+        name: install dependency
+        run: npm ci --prefer-offline
+      - 
+        name: verify code
+        run: npm run lint
+      - 
+        name: check packages vulerabilities
+        run: npm audit --moderate
+      - 
+        name: unit tests
+        run: npm run test:ci
+      - 
+        name: Upload e2e coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        env: 
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+        # with:
+        #   token: ${{ secrets.CODECOV_TOKEN }}
+        #   slug: st2f/node-vue-cicd-docker
+
+  build-frontend-and-node-api:
+    needs: [tests-frontend, tests-backend]
     runs-on: ubuntu-24.04
 
     strategy:

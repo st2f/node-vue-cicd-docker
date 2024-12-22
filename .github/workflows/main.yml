@@ -111,8 +111,8 @@ jobs:
           context: ${{ matrix.context_name }}
           push: true
           tags: ${{ matrix.image_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
 
   e2e:
     needs: [build-frontend-and-node-api]

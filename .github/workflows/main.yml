@@ -173,4 +173,4 @@ jobs:
           ssh-add - <<< "$SSH_KEY_VPS"
           ssh-keyscan -t rsa -H $SERVER_PROD_IP >> ~/.ssh/known_hosts
           scp docker-compose.production.yml $SERVER_PROD_USER@$SERVER_PROD_IP:/var/www-prod/docker-compose.production.yml
-          ssh $SERVER_PROD_USER@$SERVER_PROD_IP "docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} && docker compose -f /var/wwww-prod/docker-compose.production.yml up -d --force-recreate"
+          ssh $SERVER_PROD_USER@$SERVER_PROD_IP "docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} && docker compose -f /var/www-prod/docker-compose.production.yml up -d --force-recreate"

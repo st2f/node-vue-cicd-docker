@@ -3,6 +3,11 @@ on:
   push:
     branches: main
 
+env:
+  SERVER_PROD_USER: ${{ secrets.SERVER_USER }}
+  SERVER_PROD_IP: ${{ secrets.SERVER_IP }}
+  SSH_KEY_VPS: ${{ secrets.VPS_KEY }}
+
 jobs:
 
   tests-frontend:
@@ -111,8 +116,8 @@ jobs:
           context: ${{ matrix.context_name }}
           push: true
           tags: ${{ matrix.image_name }}
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   e2e:
     needs: [build]
@@ -147,3 +152,31 @@ jobs:
       -
         name: cleanup containers & volumes
         run : docker compose down -v --remove-orphans
+
+  deploy-production:
+    needs: e2e
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: prod
+      url: http://SERVER_PROD_IP
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - 
+        name: checkout code
+        uses: actions/checkout@v4
+      - 
+        name: deploy prod
+        run: |
+          mkdir -p ~/.ssh
+          eval $(ssh-agent -s)
+          ssh-add - <<< "$SSH_KEY_VPS"
+          ssh-keyscan -t rsa -H $SERVER_IP >> ~/.ssh/known_hosts
+          
+          scp docker-compose.production.yml $SERVER_USER@$SERVER_IP:/var/www2:docker-compose.production.yml
+          
+          ssh $SERVER_USER@$SERVER_IP "docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} && docker compose -f /var/www2:docker-compose.production.yml up -d --force-recreate"

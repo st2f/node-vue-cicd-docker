@@ -1,0 +1,22 @@
+services:
+
+  node-api:
+    image: ghcr.io/st2f/node-vue-cicd-docker/node-api:latest
+    environment:
+      - NODE_ENV=production
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  frontend:
+    image: ghcr.io/st2f/node-vue-cicd-docker/frontend:latest
+    ports:
+      -
+        target: 80
+        published: 80
+    restart: always
+     
